@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pac-Man Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: black;
+        }
+        canvas {
+            display: block;
+            margin: auto;
+            background-color: #000;
+        }
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+        }
+        .control-button {
+            display: inline-block;
+            margin: 5px;
+            padding: 10px;
+            background-color: #444;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="500" height="500"></canvas>
+    <div class="controls">
+        <button class="control-button" id="left">←</button>
+        <button class="control-button" id="up">↑</button>
+        <button class="control-button" id="down">↓</button>
+        <button class="control-button" id="right">→</button>
+    </div>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const pacSize = 40;
+        let pacX = canvas.width / 2 - pacSize / 2;
+        let pacY = canvas.height / 2 - pacSize / 2;
+        let pacDirection = 'right';
+
+        function drawPacMan() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.arc(pacX + pacSize / 2, pacY + pacSize / 2, pacSize / 2, 0.2 * Math.PI, 1.8 * Math.PI);
+            ctx.lineTo(pacX + pacSize / 2, pacY + pacSize / 2);
+            ctx.fillStyle = 'yellow';
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        function updatePacManPosition() {
+            switch (pacDirection) {
+                case 'left':
+                    pacX -= 5;
+                    break;
+                case 'right':
+                    pacX += 5;
+                    break;
+                case 'up':
+                    pacY -= 5;
+                    break;
+                case 'down':
+                    pacY += 5;
+                    break;
+            }
+
+            if (pacX < 0) pacX = 0;
+            if (pacY < 0) pacY = 0;
+            if (pacX > canvas.width - pacSize) pacX = canvas.width - pacSize;
+            if (pacY > canvas.height - pacSize) pacY = canvas.height - pacSize;
+        }
+
+        function gameLoop() {
+            updatePacManPosition();
+            drawPacMan();
+            requestAnimationFrame(gameLoop);
+        }
+        gameLoop();
+
+        document.getElementById('left').addEventListener('click', () => pacDirection = 'left');
+        document.getElementById('right').addEventListener('click', () => pacDirection = 'right');
+        document.getElementById('up').addEventListener('click', () => pacDirection = 'up');
+        document.getElementById('down').addEventListener('click', () => pacDirection = 'down');
+        
+        // Touch event handlers
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const touchX = touch.clientX;
+            const touchY = touch.clientY;
+
+            if (touchX < window.innerWidth / 2 && touchY > window.innerHeight / 2) {
+                pacDirection = 'left';
+            } else if (touchX > window.innerWidth / 2 && touchY > window.innerHeight / 2) {
+                pacDirection = 'right';
+            } else if (touchY < window.innerHeight / 2) {
+                pacDirection = touchX < window.innerWidth / 2 ? 'up' : 'down';
+            }
+        });
+    </script>
+</body>
+</html>
